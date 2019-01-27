@@ -31,7 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,MyAdapter.DetailInformation {
     private RecyclerView mNumbersListView;
     private MyAdapter myAdapter;
     private LinearLayoutManager layoutManager;
@@ -79,8 +79,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         //获取信息列表
         setfeeds();
 
@@ -233,5 +231,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void openDetailInformation() {
+
     }
 }
