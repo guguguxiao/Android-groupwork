@@ -16,11 +16,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.homework.grop.group_homework.network.FeedResponse;
+import com.homework.grop.group_homework.network.IMiniDouyinService;
+import com.homework.grop.group_homework.network.RetrofitManager;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,21 +37,49 @@ public class MainActivity extends AppCompatActivity
     private LinearLayoutManager layoutManager;
     private List<Feed>feeds;
 
+
+
+    public void fetchFeed() {
+        RetrofitManager.get(IMiniDouyinService.HOST).create(IMiniDouyinService.class).fetchFeed().enqueue(new Callback<FeedResponse>() {
+            @Override
+            public void onResponse(Call<FeedResponse> call, Response<FeedResponse> response) {
+                //Log.d(TAG, "onResponse() called with: call = [" + call + "], response = [" + response.body() + "]");
+                if (response.isSuccessful()) {
+                    feeds.clear();
+                    feeds.addAll(response.body().getFeeds());
+                    mNumbersListView.getAdapter().notifyDataSetChanged();
+                } else {
+                    Toast.makeText(MainActivity.this, "fetch feed failure!", Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override public void onFailure(Call<FeedResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
+
+
+
+
     public void setfeeds(){
         feeds=new LinkedList<>();
-        Feed feed=new Feed();
-        feed.setImageUrl("https://cdn2.thecatapi.com/images/2a1.jpg");
-        feed.setVideoUrl("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
-        feed.setStudentId("1120172710");
-        feed.setUserName("顾骁");
-        for(int i=0;i<20;i++)
-            feeds.add(feed);
+        fetchFeed();
+//        Feed feed=new Feed();
+//        feed.setImageUrl("https://cdn2.thecatapi.com/images/2a1.jpg");
+//        feed.setVideoUrl("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4");
+//        feed.setStudentId("1120172710");
+//        feed.setUserName("顾骁");
+//        for(int i=0;i<20;i++)
+//            feeds.add(feed);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         //获取信息列表
         setfeeds();
