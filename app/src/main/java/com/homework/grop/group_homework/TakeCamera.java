@@ -24,7 +24,7 @@ import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_IMAGE;
 import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_VIDEO;
 import static com.homework.grop.group_homework.Utils.getOutputMediaFile;
 
-public class takeCamera extends AppCompatActivity implements SurfaceHolder.Callback {
+public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callback {
 
     private SurfaceHolder mSurfaceHolder;
     private SurfaceView mSurdaceView;

@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".takeCamera"
+            android:name=".TakeCamera"
             android:screenOrientation="portrait"
             android:label="takeCamera"
             android:theme="@style/AppTheme.NoActionBar"></activity>

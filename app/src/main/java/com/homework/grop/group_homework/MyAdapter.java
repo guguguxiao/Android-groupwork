@@ -6,23 +6,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
+import java.util.List;
 
-//    private List<String> urls;
-//    public MyAdapter(List<String> urls) {
-//        this.urls=urls;
-//    }
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
     MainActivity activity;
     ImageView imageView;
     OrientationUtils orientationUtils;
-
-    public MyAdapter(MainActivity activity) {
-      // this.imageView=new ImageView(activity);
+    List<Feed>feeds;
+    public MyAdapter(List<Feed>feeds,MainActivity activity) {
+        this.feeds=feeds;
         this.activity=activity;
     }
     @NonNull
@@ -39,32 +38,40 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            holder.init();
+            holder.init(position);
     }
 
     @Override
     public int getItemCount() {
-        return 10;
+        return feeds.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private StandardGSYVideoPlayer videoPlayer;
-
+        private Button button;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
         videoPlayer=itemView.findViewById(R.id.detail_player);
+            button=itemView.findViewById(R.id.button2);
         }
-        private void init() {
+        private void init(int position) {
 
-           // Glide.with(activity).load("").into(imageView);
-            String source1 = "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4";//可以改成从string数组内获取url
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+
+
+            String source1 = feeds.get(position).getVideoUrl();
             imageView=new ImageView(activity);
-            imageView.setImageResource(R.mipmap.xxx1);
+            Glide.with(activity).load(feeds.get(position).getImageUrl()).into(imageView);
             videoPlayer.setUp(source1, true, "测试视频");
             videoPlayer.setThumbImageView(imageView);
             videoPlayer.getTitleTextView().setVisibility(View.INVISIBLE);
             videoPlayer.getBackButton().setVisibility(View.INVISIBLE);//感觉不加标题看起来跟好看些
-
             orientationUtils = new OrientationUtils(activity, videoPlayer);
             //设置全屏按键功能,这是使用的是选择屏幕，而不是全屏
             videoPlayer.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
@@ -80,6 +87,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
 
 
     }
-
+interface DetailInformation{
+        public void openDetailInformation();
+}
 
 }
