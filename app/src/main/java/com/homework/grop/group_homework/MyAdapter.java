@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
@@ -18,6 +19,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
 //    }
     MainActivity activity;
     ImageView imageView;
+    OrientationUtils orientationUtils;
+
     public MyAdapter(MainActivity activity) {
       // this.imageView=new ImageView(activity);
         this.activity=activity;
@@ -61,6 +64,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
             videoPlayer.setThumbImageView(imageView);
             videoPlayer.getTitleTextView().setVisibility(View.INVISIBLE);
             videoPlayer.getBackButton().setVisibility(View.INVISIBLE);//感觉不加标题看起来跟好看些
+
+            orientationUtils = new OrientationUtils(activity, videoPlayer);
+            //设置全屏按键功能,这是使用的是选择屏幕，而不是全屏
+            videoPlayer.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    orientationUtils.resolveByClick();
+                }
+            });
+            //是否可以滑动调整
             videoPlayer.setIsTouchWiget(true);
             videoPlayer.startPlayLogic();
         }
