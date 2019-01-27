@@ -1,8 +1,10 @@
 package com.homework.grop.group_homework;
 
+import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,10 +17,23 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.homework.grop.group_homework.network.IMiniDouyinService;
+import com.homework.grop.group_homework.network.PostVideoResponse;
+import com.homework.grop.group_homework.network.ResourceUtils;
+import com.homework.grop.group_homework.network.RetrofitManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_IMAGE;
 import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_VIDEO;
@@ -40,6 +55,15 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
     private Button take_record;
     private FloatingActionButton facing;
     private FloatingActionButton Iflash;
+
+
+    private Button take_camera_file;
+    public Uri mSelectedImage;
+    private Uri mSelectedVideo;
+    private static final int PICK_IMAGE = 1;
+    private static final int PICK_VIDEO = 2;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,6 +140,34 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
                 }
             }
         });
+
+
+
+
+        //修改File按钮
+
+        take_camera_file=(Button)findViewById(R.id.take_camera_file);
+        take_camera_file.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                String s = take_camera_file.getText().toString();
+                if (getString(R.string.select_an_image).equals(s)) {
+                    chooseImage();
+                } else if (getString(R.string.select_a_video).equals(s)) {
+                    chooseVideo();
+                } else if (getString(R.string.post_it).equals(s)) {
+                    if (mSelectedVideo != null && mSelectedImage != null) {
+                        postVideo();
+                    } else {
+                        throw new IllegalArgumentException("error data uri, mSelectedVideo = "+mSelectedVideo+", mSelectedImage = "+mSelectedImage);
+                    }
+                } else if ((getString(R.string.success_try_refresh).equals(s))) {
+                    take_camera_file.setText(R.string.select_an_image);
+                }
+            }
+        });
+
+
+
 
         facing=(FloatingActionButton)findViewById(R.id.take_camera_facing);
         facing.setOnClickListener(new View.OnClickListener() {
@@ -295,23 +347,93 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
         mMediaRecorder.release();
         mMediaRecorder=null;
     }
-private Camera.PictureCallback mPicture=new Camera.PictureCallback() {
-    @Override
-    public void onPictureTaken(byte[] data, Camera camera) {
-        File pictureFile=getOutputMediaFile(MEDIA_TYPE_IMAGE);
-        if(pictureFile==null){
-            return;
+    private Camera.PictureCallback mPicture=new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            File pictureFile=getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if(pictureFile==null){
+                return;
+            }
+            try{
+                FileOutputStream fos=new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            }catch (IOException e){
+                Log.d("mPicture","Error accessing file: "+e.getMessage());
+            }
+            mCamera.startPreview();
         }
-        try{
-            FileOutputStream fos=new FileOutputStream(pictureFile);
-            fos.write(data);
-            fos.close();
-        }catch (IOException e){
-            Log.d("mPicture","Error accessing file: "+e.getMessage());
-        }
-        mCamera.startPreview();
+    };
+
+
+
+
+
+    public void chooseImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),
+                PICK_IMAGE);
     }
-};
+
+
+    public void chooseVideo() {
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Video"),
+                PICK_VIDEO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK && null != data) {
+
+            if (requestCode == PICK_IMAGE) {
+                mSelectedImage = data.getData();
+                take_camera_file.setText(R.string.select_a_video);
+            } else if (requestCode == PICK_VIDEO) {
+                mSelectedVideo = data.getData();
+                take_camera_file.setText(R.string.post_it);
+            }
+        }
+    }
+
+    private MultipartBody.Part getMultipartFromUri(String name, Uri uri) {
+        // if NullPointerException thrown, try to allow storage permission in system settings
+        File f = new File(ResourceUtils.getRealPath(TakeCamera.this, uri));
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f);
+        return MultipartBody.Part.createFormData(name, f.getName(), requestFile);
+    }
+
+    private void postVideo() {
+        take_camera_file.setText("POSTING...");
+        take_camera_file.setEnabled(false);
+        RetrofitManager.get(IMiniDouyinService.HOST).create(IMiniDouyinService.class).createVideo("1120170000", "test", getMultipartFromUri("cover_image", mSelectedImage), getMultipartFromUri("video", mSelectedVideo)).enqueue(new Callback<PostVideoResponse>() {
+            @Override
+            public void onResponse(Call<PostVideoResponse> call, Response<PostVideoResponse> response) {
+                String toast;
+                if (response.isSuccessful()) {
+                    toast = "Post Success!";
+                    take_camera_file.setText(R.string.success_try_refresh);
+                } else {
+                    toast = "Post Failure...";
+                    take_camera_file.setText(R.string.post_it);
+                }
+                Toast.makeText(TakeCamera.this, toast, Toast.LENGTH_LONG).show();
+                take_camera_file.setEnabled(true);
+            }
+
+            @Override public void onFailure(Call<PostVideoResponse> call, Throwable t) {
+                Toast.makeText(TakeCamera.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                take_camera_file.setText(R.string.post_it);
+                take_camera_file.setEnabled(true);
+            }
+        });
+    }
 
 
 }

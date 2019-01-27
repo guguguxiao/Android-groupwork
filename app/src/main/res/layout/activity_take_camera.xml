@@ -47,7 +47,6 @@
         android:layout_marginTop="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_menu_camera"
         android:backgroundTint="@color/colorPrimary"/>
 
     <android.support.design.widget.FloatingActionButton
@@ -55,6 +54,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:src="@drawable/light"
         android:backgroundTint="@color/design_default_color_primary_dark"/>
 </RelativeLayout>
