@@ -59,7 +59,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    DetailInformation detailInformation=activity;
+                    detailInformation.openDetailInformation(feeds.get(position));
                 }
             });
 
@@ -88,7 +89,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
 
     }
 interface DetailInformation{
-        public void openDetailInformation();
+        public void openDetailInformation(Feed feed);
 }
 
 }

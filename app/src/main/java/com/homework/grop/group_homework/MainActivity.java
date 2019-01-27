@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity
     private MyAdapter myAdapter;
     private LinearLayoutManager layoutManager;
     private List<Feed>feeds;
-
+    private  StandardGSYVideoPlayer standardGSYVideoPlayer;
 
 
     public void fetchFeed() {
@@ -49,10 +50,12 @@ public class MainActivity extends AppCompatActivity
                     feeds.addAll(response.body().getFeeds());
                     mNumbersListView.getAdapter().notifyDataSetChanged();
                 } else {
+
                     Toast.makeText(MainActivity.this, "fetch feed failure!", Toast.LENGTH_LONG).show();
                 }
             }
             @Override public void onFailure(Call<FeedResponse> call, Throwable t) {
+                Log.d("aaaaa", "onResponse: "+MainActivity.this+t.getMessage());
                 Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
 
@@ -111,8 +114,10 @@ public class MainActivity extends AppCompatActivity
                     mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
                     //Log.d("ccc", "onScrolled: "+mStandardGSYVideoPlayer.getHeight());
                     //大概第二个视频居中时底下视频开始播放
-                    if (screenPosition[1] <= 1200 && !mStandardGSYVideoPlayer.isInPlayingState())
+                    if (screenPosition[1] <= 800 && !mStandardGSYVideoPlayer.isInPlayingState()) {
                         mStandardGSYVideoPlayer.startPlayLogic();
+                        standardGSYVideoPlayer=mStandardGSYVideoPlayer;
+                    }
                 }else{//上划
                     if(lastVisibleItem==firstVisibleItem){
                         //上划刷新
@@ -124,8 +129,9 @@ public class MainActivity extends AppCompatActivity
                     StandardGSYVideoPlayer mStandardGSYVideoPlayer = (StandardGSYVideoPlayer) recyclerView.getChildAt(lastVisibleItem - firstVisibleItem-1).findViewById(R.id.detail_player);
                     int[] screenPosition = new int[2];
                     mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
-                    if (screenPosition[1] >= -1200 && !mStandardGSYVideoPlayer.isInPlayingState())
+                    if (screenPosition[1] >= -800 && !mStandardGSYVideoPlayer.isInPlayingState())
                         mStandardGSYVideoPlayer.startPlayLogic();
+                        standardGSYVideoPlayer=mStandardGSYVideoPlayer;
                     }
                 }
             }
@@ -234,7 +240,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void openDetailInformation() {
-
+    public void onStop()
+    {super.onStop();
+    if(standardGSYVideoPlayer!=null)
+        standardGSYVideoPlayer.release();
+    }
+    @Override
+    public void openDetailInformation(Feed feed) {
+        Intent intent=new Intent(this,DetailVideoActivity.class);
+        intent.putExtra("video_url",feed.getVideoUrl());
+        intent.putExtra("image_url",feed.getImageUrl());
+        intent.putExtra("username",feed.getUserName());
+        intent.putExtra("student_id",feed.getStudentId());
+        startActivity(intent);
     }
 }
