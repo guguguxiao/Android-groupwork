@@ -11,13 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -48,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                   // mTextMessage.setText(R.string.title_home);
+                   setMainScreeen();
                     return true;
                 case R.id.navigation_dashboard:
                     //mTextMessage.setText(R.string.title_dashboard);
@@ -100,10 +94,8 @@ public class MainActivity extends AppCompatActivity
 //        for(int i=0;i<20;i++)
 //            feeds.add(feed);
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void setMainScreeen()
+    {
         setContentView(R.layout.activity_main);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -146,24 +138,18 @@ public class MainActivity extends AppCompatActivity
                 }else{//上划
                     if(lastVisibleItem==firstVisibleItem){
                         //上划刷新
-
-
-
-
+                        setMainScreeen();
                     }else{
-                    StandardGSYVideoPlayer mStandardGSYVideoPlayer = (StandardGSYVideoPlayer) recyclerView.getChildAt(lastVisibleItem - firstVisibleItem-1).findViewById(R.id.detail_player);
-                    int[] screenPosition = new int[2];
-                    mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
-                    if (screenPosition[1] >= -800 && !mStandardGSYVideoPlayer.isInPlayingState())
-                        mStandardGSYVideoPlayer.startPlayLogic();
+                        StandardGSYVideoPlayer mStandardGSYVideoPlayer = (StandardGSYVideoPlayer) recyclerView.getChildAt(lastVisibleItem - firstVisibleItem-1).findViewById(R.id.detail_player);
+                        int[] screenPosition = new int[2];
+                        mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
+                        if (screenPosition[1] >= -800 && !mStandardGSYVideoPlayer.isInPlayingState())
+                            mStandardGSYVideoPlayer.startPlayLogic();
                         standardGSYVideoPlayer=mStandardGSYVideoPlayer;
                     }
                 }
             }
         });
-
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,6 +165,11 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(MainActivity.this,TakeCamera.class));
             }
         });
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setMainScreeen();
 
     }
 
