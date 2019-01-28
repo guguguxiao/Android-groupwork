@@ -18,7 +18,7 @@
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/take_camera_picture"
         android:backgroundTint="@color/colorPrimary"
-        android:src="@drawable/ic_menu_gallery"/>
+        android:src="@drawable/gallery"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/take_camera_picture"
@@ -29,7 +29,7 @@
         android:layout_marginRight="50dp"
         android:layout_centerInParent="true"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/ic_menu_camera"/>
+        android:src="@drawable/camera"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/take_camera_record"
@@ -48,7 +48,7 @@
         android:layout_marginTop="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_menu_camera"
+        android:src="@drawable/reverse"
 
         android:backgroundTint="@color/colorPrimary"/>
 
