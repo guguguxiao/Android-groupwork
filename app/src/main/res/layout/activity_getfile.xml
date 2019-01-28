@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/zzz">
+
+    <Button
+        android:id="@+id/file_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="select image"
+        android:layout_toLeftOf="@id/file_post"
+        android:layout_above="@id/file_post"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:id="@+id/file_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="select video"
+        android:layout_toRightOf="@id/file_post"
+        android:layout_above="@id/file_post"
+        android:layout_marginBottom="20dp"/>
+
+    <!--<Button-->
+        <!--android:id="@+id/file_post"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Post it!"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="150dp" />-->
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/file_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="150dp"
+        android:src="@drawable/upload2"/>
+
+</RelativeLayout>

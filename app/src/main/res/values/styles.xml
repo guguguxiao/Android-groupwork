@@ -17,4 +17,22 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+
+    <style name="LoginTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- 让actionbar漂浮 -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <!-- 去掉ActionBar与Activity之间的蓝色横线 -->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:actionBarStyle">@style/LoginActionbarStyle</item>
+    </style>
+
+    <style name="LoginActionbarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <!-- 设置actionbar 背景色 透明 -->
+        <item name="android:background">#00000000</item>
+        <item name="android:backgroundStacked">#346c36</item>
+        <item name="android:backgroundSplit">#00000000</item>
+    </style>
+
+
 </resources>

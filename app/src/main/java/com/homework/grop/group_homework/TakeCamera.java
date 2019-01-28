@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -16,34 +16,23 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.homework.grop.group_homework.network.IMiniDouyinService;
-import com.homework.grop.group_homework.network.PostVideoResponse;
-import com.homework.grop.group_homework.network.ResourceUtils;
-import com.homework.grop.group_homework.network.RetrofitManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.List;
 
 import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_IMAGE;
 import static com.homework.grop.group_homework.Utils.MEDIA_TYPE_VIDEO;
 import static com.homework.grop.group_homework.Utils.getOutputMediaFile;
+
 
 public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callback {
 
     private SurfaceHolder mSurfaceHolder;
     private SurfaceView mSurdaceView;
     private Camera mCamera;
+    private MediaRecorder mMediaRecorder;
 
     private int CAMERA_TYPE=Camera.CameraInfo.CAMERA_FACING_BACK;
     private boolean isRecording=false;//录像
@@ -51,19 +40,14 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
     private Camera.Parameters parameters;
     private int rotationDeree=0;
 
-    private Button take_picture;
-    private Button take_record;
+    private FloatingActionButton take_picture;
+    private FloatingActionButton take_record;
+    private FloatingActionButton take_file;
     private FloatingActionButton facing;
     private FloatingActionButton Iflash;
 
-
-    private Button take_camera_file;
-    public Uri mSelectedImage;
-    private Uri mSelectedVideo;
-    private static final int PICK_IMAGE = 1;
-    private static final int PICK_VIDEO = 2;
-
-
+    private static final int IMAGE_CODE=1;
+    private static final int VIEDO_MODE=2;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,43 +57,10 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_take_camera);
 
-        mSurdaceView=findViewById(R.id.take_camrea_img);
-        //添加callback
-        mCamera=getCamera(CAMERA_TYPE);
-        mSurdaceView=findViewById(R.id.take_camrea_img);
-        mSurfaceHolder=mSurdaceView.getHolder();
-        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                try {
-                    mCamera.setPreviewDisplay(holder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                mCamera.startPreview();
-            }
+        //初始化相机
+        initCamera();
 
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-                try {
-                    mCamera.setPreviewDisplay(holder);
-                    mCamera.startPreview();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                mCamera.stopPreview();
-                mCamera.release();
-                mCamera=null;
-            }
-        });
-
-        take_picture=(Button)findViewById(R.id.take_camera_picture);
+        take_picture=(FloatingActionButton) findViewById(R.id.take_camera_picture);
         take_picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,21 +68,22 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
             }
         });
 
-        take_record=(Button)findViewById(R.id.take_camera_record);
+        take_record=(FloatingActionButton) findViewById(R.id.take_camera_record);
         take_record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isRecording){
                     //停止录制
-
                     releaseMediaRecorder();
-                    setCaptureButtonText("RECORD");
+                    //变换图标以提示
+                    take_record.setImageDrawable(getResources().getDrawable(R.drawable.record_light));
                     isRecording=false;
                 } else{
                     //开始录制
                     if(prepareVideoRecorder()){
                         mMediaRecorder.start();
-                        setCaptureButtonText("STOP");
+                        //变换图标以提示
+                        take_record.setImageDrawable(getResources().getDrawable(R.drawable.recording));
                         isRecording=true;
                     }else {
                         //异常，退出
@@ -140,34 +92,6 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
                 }
             }
         });
-
-
-
-
-        //修改File按钮
-
-        take_camera_file=(Button)findViewById(R.id.take_camera_file);
-        take_camera_file.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                String s = take_camera_file.getText().toString();
-                if (getString(R.string.select_an_image).equals(s)) {
-                    chooseImage();
-                } else if (getString(R.string.select_a_video).equals(s)) {
-                    chooseVideo();
-                } else if (getString(R.string.post_it).equals(s)) {
-                    if (mSelectedVideo != null && mSelectedImage != null) {
-                        postVideo();
-                    } else {
-                        throw new IllegalArgumentException("error data uri, mSelectedVideo = "+mSelectedVideo+", mSelectedImage = "+mSelectedImage);
-                    }
-                } else if ((getString(R.string.success_try_refresh).equals(s))) {
-                    take_camera_file.setText(R.string.select_an_image);
-                }
-            }
-        });
-
-
-
 
         facing=(FloatingActionButton)findViewById(R.id.take_camera_facing);
         facing.setOnClickListener(new View.OnClickListener() {
@@ -215,11 +139,82 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
                 }
             }
         });
+
+        mSurdaceView=(SurfaceView)findViewById(R.id.take_camrea_img);
+        mSurdaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doAutoFocus();
+            }
+        });
+
+        take_file=(FloatingActionButton)findViewById(R.id.take_camera_file);
+        take_file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //跳转提交页面
+                startActivity(new Intent(TakeCamera.this,GetFile.class));
+
+            }
+        });
     }
 
-    private void setCaptureButtonText(String str) {
-        //拍摄与否的提示
-        take_record.setText(str);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mCamera==null){
+            mCamera=getCamera(CAMERA_TYPE);
+            if(mSurfaceHolder!=null){
+                startPreview(mSurfaceHolder);
+            }
+        }
+    }
+
+    private void initCamera(){
+        mSurdaceView=findViewById(R.id.take_camrea_img);
+        mCamera=getCamera(CAMERA_TYPE);
+        mSurdaceView=findViewById(R.id.take_camrea_img);
+        mSurfaceHolder=mSurdaceView.getHolder();
+        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                try {
+                    mCamera.setPreviewDisplay(holder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mCamera.startPreview();
+                mCamera.cancelAutoFocus();
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {
+                        if(success){
+                            mCamera.cancelAutoFocus();
+                            doAutoFocus();
+                            //改变位置即自动对焦
+                        }
+                    }
+                });
+                try {
+                    mCamera.setPreviewDisplay(holder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mCamera.startPreview();
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera=null;
+            }
+        });
     }
 
 
@@ -241,6 +236,7 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
     private static final int DEGREE_360 = 360;
 
     private int getCameraDisplayOrientation(int cameraId) {
+        //旋转相机角度
         Camera.CameraInfo info =
                 new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, info);
@@ -274,6 +270,30 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
         return result;
     }
 
+    private void doAutoFocus(){
+        //自动对焦
+        parameters=mCamera.getParameters();
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        mCamera.setParameters(parameters);
+        mCamera.autoFocus(new Camera.AutoFocusCallback() {
+            @Override
+            public void onAutoFocus(boolean success, Camera camera) {
+                if(success){
+                    mCamera.cancelAutoFocus();
+                    if(!Build.MODEL.equals("KORIDY H30")){
+                        parameters=mCamera.getParameters();
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                        mCamera.setParameters(parameters);
+                    }else {
+                        parameters=mCamera.getParameters();
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                        mCamera.setParameters(parameters);
+                    }
+                }
+            }
+        });
+    }
+
     private void releaseCameraAndPreview() {
         //释放camera资源
 
@@ -286,14 +306,13 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
     private void startPreview(SurfaceHolder holder) {
         try {
             //绑定surfaceview
-            mCamera.setPreviewDisplay(mSurfaceHolder);
+            mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();//开始预览
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private MediaRecorder mMediaRecorder;
 
     private boolean prepareVideoRecorder() {
         //准备MediaRecorder
@@ -304,7 +323,8 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-        mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+        mMediaRecorder.setOutputFile(getOutputMediaFile(TakeCamera.this,MEDIA_TYPE_VIDEO).toString());
+
         mMediaRecorder.setPreviewDisplay(mSurdaceView.getHolder().getSurface());
         mMediaRecorder.setOrientationHint(rotationDeree);
 
@@ -314,7 +334,6 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
             releaseMediaRecorder();
             return false;
         }
-
         return true;
     }
 
@@ -330,6 +349,8 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
         }
     }
 
+    Camera.Size Size;
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         startPreview(holder);
@@ -337,7 +358,10 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
     }
+
+    Camera.Size size;
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -347,93 +371,53 @@ public class TakeCamera extends AppCompatActivity implements SurfaceHolder.Callb
         mMediaRecorder.release();
         mMediaRecorder=null;
     }
-    private Camera.PictureCallback mPicture=new Camera.PictureCallback() {
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            File pictureFile=getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if(pictureFile==null){
-                return;
-            }
-            try{
-                FileOutputStream fos=new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            }catch (IOException e){
-                Log.d("mPicture","Error accessing file: "+e.getMessage());
-            }
-            mCamera.startPreview();
+
+    private Camera.PictureCallback mPicture=(data,camera)->{
+        File pictureFile=getOutputMediaFile(TakeCamera.this,MEDIA_TYPE_IMAGE);
+
+        if(pictureFile==null){
+            return;
         }
+        try{
+            FileOutputStream fos=new FileOutputStream(pictureFile);
+            fos.write(data);
+            fos.close();
+        }catch (IOException e){
+            Log.d("mPicture","Error accessing file: "+e.getMessage());
+        }
+        mCamera.startPreview();
     };
 
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) h / w;
 
+        if (sizes == null) return null;
 
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
 
+        int targetHeight = Math.min(w, h);
 
-    public void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"),
-                PICK_IMAGE);
-    }
-
-
-    public void chooseVideo() {
-        Intent intent = new Intent();
-        intent.setType("video/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Video"),
-                PICK_VIDEO);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK && null != data) {
-
-            if (requestCode == PICK_IMAGE) {
-                mSelectedImage = data.getData();
-                take_camera_file.setText(R.string.select_a_video);
-            } else if (requestCode == PICK_VIDEO) {
-                mSelectedVideo = data.getData();
-                take_camera_file.setText(R.string.post_it);
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
             }
         }
-    }
 
-    private MultipartBody.Part getMultipartFromUri(String name, Uri uri) {
-        // if NullPointerException thrown, try to allow storage permission in system settings
-        File f = new File(ResourceUtils.getRealPath(TakeCamera.this, uri));
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f);
-        return MultipartBody.Part.createFormData(name, f.getName(), requestFile);
-    }
-
-    private void postVideo() {
-        take_camera_file.setText("POSTING...");
-        take_camera_file.setEnabled(false);
-        RetrofitManager.get(IMiniDouyinService.HOST).create(IMiniDouyinService.class).createVideo("1120170000", "test", getMultipartFromUri("cover_image", mSelectedImage), getMultipartFromUri("video", mSelectedVideo)).enqueue(new Callback<PostVideoResponse>() {
-            @Override
-            public void onResponse(Call<PostVideoResponse> call, Response<PostVideoResponse> response) {
-                String toast;
-                if (response.isSuccessful()) {
-                    toast = "Post Success!";
-                    take_camera_file.setText(R.string.success_try_refresh);
-                } else {
-                    toast = "Post Failure...";
-                    take_camera_file.setText(R.string.post_it);
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
                 }
-                Toast.makeText(TakeCamera.this, toast, Toast.LENGTH_LONG).show();
-                take_camera_file.setEnabled(true);
             }
-
-            @Override public void onFailure(Call<PostVideoResponse> call, Throwable t) {
-                Toast.makeText(TakeCamera.this, t.getMessage(), Toast.LENGTH_LONG).show();
-                take_camera_file.setText(R.string.post_it);
-                take_camera_file.setEnabled(true);
-            }
-        });
+        }
+        return optimalSize;
     }
-
 
 }

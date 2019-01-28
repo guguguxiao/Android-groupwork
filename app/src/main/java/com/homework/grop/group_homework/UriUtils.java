@@ -18,13 +18,6 @@ public class UriUtils {
 
     }
 
-    /**
-     * 根据Uri的不同Scheme解析出在本机的路径
-     *
-     * @param context
-     * @param uri
-     * @return Uri的真实路径
-     */
     @TargetApi(19)
     public static String formatUri(Context context, Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;

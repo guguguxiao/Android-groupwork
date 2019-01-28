@@ -28,14 +28,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".TakeCamera"
-            android:screenOrientation="portrait"
-            android:label="takeCamera"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".DetailVideoActivity" />
         <activity android:name=".ChatroomActivity" />
         <activity android:name=".MessageActivity" />
+        <activity
+            android:name=".GetFile"
+            android:screenOrientation="portrait"
+            android:label="GetFile"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".TakeCamera"
+            android:screenOrientation="portrait"
+            android:label="TakeCamera"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.homework.grop.group_homework;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -99,14 +100,15 @@ public class Utils {
     /**
      * Create a File for saving an image or video
      */
-    public static File getOutputMediaFile(int type) {
+    public static File getOutputMediaFile(Context context, int type) {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "group_homework");
+                Environment.DIRECTORY_PICTURES), "bigwork");
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 return null;
             }
         }
+
 
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -114,6 +116,7 @@ public class Utils {
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".jpg");
+
         } else if (type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "VID_" + timeStamp + ".mp4");
@@ -121,8 +124,14 @@ public class Utils {
             return null;
         }
 
+        Intent intent=new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri uri=Uri.fromFile(mediaFile);
+        intent.setData(uri);
+        context.sendBroadcast(intent);
+
         return mediaFile;
     }
+
 
 
     private static final int NUM_90 = 90;
