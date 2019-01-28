@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
@@ -49,13 +50,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private StandardGSYVideoPlayer videoPlayer;
         private Button button;
+        private LottieAnimationView animationView;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
         videoPlayer=itemView.findViewById(R.id.detail_player);
             button=itemView.findViewById(R.id.button2);
+            animationView=itemView.findViewById(R.id.animation_view);
+
         }
         private void init(int position) {
-
+            animationView.setOnClickListener((v)->{
+                animationView.playAnimation();
+            });
+            animationView.setProgress(0 );
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -63,8 +70,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
                     detailInformation.openDetailInformation(feeds.get(position));
                 }
             });
-
-
 
             String source1 = feeds.get(position).getVideoUrl();
             imageView=new ImageView(activity);

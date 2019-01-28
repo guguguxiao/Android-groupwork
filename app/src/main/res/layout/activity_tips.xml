@@ -7,15 +7,13 @@
     android:background="@color/colorBackground"
     android:orientation="vertical"
     tools:background="@color/colorBackground">
-
-
     <TextView
         android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:fontFamily="sans-serif"
-        android:text="消息"
+        android:text="娑堟伅"
         android:padding="10sp"
         android:textColor="#ffffff"
         android:textSize="20sp"
@@ -27,16 +25,17 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        app:layout_constraintBottom_toTopOf="@id/header"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/navigation"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintVertical_bias="1.0"
         tools:listitem="@layout/recycler_view_item" />
 
 
-        <!--android:visibility="invisible"-->
+    <!--android:visibility="invisible"-->
 
 
     <android.support.design.widget.BottomNavigationView
