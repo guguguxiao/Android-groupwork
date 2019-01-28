@@ -15,11 +15,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.homework.grop.group_homework.model.Message;
+import com.homework.grop.group_homework.model.PullParser;
 import com.homework.grop.group_homework.network.FeedResponse;
 import com.homework.grop.group_homework.network.IMiniDouyinService;
 import com.homework.grop.group_homework.network.RetrofitManager;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,12 +31,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
-        implements MyAdapter.DetailInformation {
+        implements MyAdapter.DetailInformation ,MessageAdapter.MyItemClickListener{
     private RecyclerView mNumbersListView;
     private MyAdapter myAdapter;
     private LinearLayoutManager layoutManager;
     private List<Feed>feeds;
     private  StandardGSYVideoPlayer standardGSYVideoPlayer;
+    private RecyclerView myNumbersListView;
+    private MessageAdapter messageAdapter;
+    private List<Message> messages;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -45,10 +51,12 @@ public class MainActivity extends AppCompatActivity
                    setMainScreeen();
                     return true;
                 case R.id.navigation_dashboard:
-                    //mTextMessage.setText(R.string.title_dashboard);
+                    setContentView(R.layout.activity_personal_page);
+                    BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+                    navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
                     return true;
                 case R.id.navigation_notifications:
-                    //mTextMessage.setText(R.string.title_notifications);
+                    setMessageScreen();
                     return true;
             }
             return false;
@@ -165,6 +173,33 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(MainActivity.this,TakeCamera.class));
             }
         });
+    }
+    public void setMessageScreen()
+    {
+        setContentView(R.layout.activity_tips);
+        myNumbersListView = findViewById(R.id.rv_list);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        try {
+            InputStream assetInput = getAssets().open("data.xml");
+            messages = PullParser.pull2xml(assetInput);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        messageAdapter =new MessageAdapter(messages,this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        myNumbersListView.setLayoutManager(layoutManager);
+        myNumbersListView.setHasFixedSize(true);
+        myNumbersListView.setAdapter(messageAdapter);
+    }
+    @Override
+    public void onListItemClick(int position)
+    {
+        Intent intent=new Intent(this,ChatroomActivity.class);
+        intent.putExtra("message",messages.get(position).getTitle());
+        startActivity(intent);
+        //Toast.makeText(this, "item"+position, Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {

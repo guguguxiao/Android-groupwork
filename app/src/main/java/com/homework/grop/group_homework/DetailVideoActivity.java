@@ -3,6 +3,7 @@ package com.homework.grop.group_homework;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.shuyu.gsyvideoplayer.GSYBaseActivityDetail;
@@ -16,6 +17,8 @@ public class DetailVideoActivity extends GSYBaseActivityDetail<StandardGSYVideoP
     private String image_url;
     private String username;
     private String student_id;
+    TextView textView1;
+    TextView textView2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +29,10 @@ public class DetailVideoActivity extends GSYBaseActivityDetail<StandardGSYVideoP
         username=bundle.getString("username");
         student_id=bundle.getString("student_id");
         //name.setText(bundle.getString("message"));
+        textView1=findViewById(R.id.user_id);
+        textView1.setText("作者id："+student_id);
+        textView2=findViewById(R.id.username);
+        textView2.setText("作者昵称："+username);
         detailPlayer = (StandardGSYVideoPlayer) findViewById(R.id.detail_player);
         //增加title
         detailPlayer.getTitleTextView().setVisibility(View.GONE);
