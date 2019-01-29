@@ -1,7 +1,10 @@
 package com.homework.grop.group_homework;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -53,6 +56,10 @@ public class MainActivity extends AppCompatActivity
                 case R.id.navigation_dashboard:
                     setContentView(R.layout.activity_personal_page);
                     BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+                    navigation.getMenu().getItem(1).setChecked(true);
+                    Resources resource=(Resources)getBaseContext().getResources();
+                    @SuppressLint("ResourceType") ColorStateList csl=(ColorStateList)resource.getColorStateList(R.drawable.navigation_menu_item_color);
+                    navigation.setItemTextColor(csl);
                     navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
                     return true;
                 case R.id.navigation_notifications:
@@ -107,6 +114,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        Resources resource=(Resources)getBaseContext().getResources();
+        @SuppressLint("ResourceType") ColorStateList csl=(ColorStateList)resource.getColorStateList(R.drawable.navigation_menu_item_color);
+        navigation.setItemTextColor(csl);
         //获取信息列表
         setfeeds();
 
@@ -179,6 +189,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_tips);
         myNumbersListView = findViewById(R.id.rv_list);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(2).setChecked(true);
+        Resources resource=(Resources)getBaseContext().getResources();
+        @SuppressLint("ResourceType") ColorStateList csl=(ColorStateList)resource.getColorStateList(R.drawable.navigation_menu_item_color);
+        navigation.setItemTextColor(csl);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         try {
             InputStream assetInput = getAssets().open("data.xml");
