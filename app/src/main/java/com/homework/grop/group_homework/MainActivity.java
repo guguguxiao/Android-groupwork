@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity
                     mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
                     //Log.d("ccc", "onScrolled: "+mStandardGSYVideoPlayer.getHeight());
                     //大概第二个视频居中时底下视频开始播放
-                    if (screenPosition[1] <= 800 && !mStandardGSYVideoPlayer.isInPlayingState()) {
+                    if (screenPosition[1] <= 500 && !mStandardGSYVideoPlayer.isInPlayingState()) {
                         mStandardGSYVideoPlayer.startPlayLogic();
                         standardGSYVideoPlayer=mStandardGSYVideoPlayer;
                     }
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity
                         StandardGSYVideoPlayer mStandardGSYVideoPlayer = (StandardGSYVideoPlayer) recyclerView.getChildAt(lastVisibleItem - firstVisibleItem-1).findViewById(R.id.detail_player);
                         int[] screenPosition = new int[2];
                         mStandardGSYVideoPlayer.getLocationOnScreen(screenPosition);
-                        if (screenPosition[1] >= -800 && !mStandardGSYVideoPlayer.isInPlayingState())
+                        if (screenPosition[1] >= -500 && !mStandardGSYVideoPlayer.isInPlayingState())
                             mStandardGSYVideoPlayer.startPlayLogic();
                         standardGSYVideoPlayer=mStandardGSYVideoPlayer;
                     }

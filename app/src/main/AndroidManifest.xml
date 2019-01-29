@@ -32,7 +32,9 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".ChatroomActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
+            />
         <activity android:name=".MessageActivity" />
         <activity
             android:name=".GetFile"
