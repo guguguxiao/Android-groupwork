@@ -4,64 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_img"
+    android:background="#000"
    >
 
-    <com.homework.grop.group_homework.widget.CircleImageView
-        android:id="@+id/person"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="24dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/person"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/name"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/person"
-
-        android:layout_marginTop="124dp"
-        android:gravity="center"
-        android:padding="10sp"
-        android:text="昵称:ZZZ"
-        android:textColor="@color/white"
-        android:textSize="25sp"
-        app:layout_constraintStart_toStartOf="@id/person"
-        app:layout_constraintTop_toTopOf="@id/person" />
-
-    <TextView
-        android:id="@+id/ID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/name"
-
-        android:layout_marginTop="64dp"
-        android:gravity="center"
-        android:text="ID:1120170000"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@id/name"
-        app:layout_constraintTop_toTopOf="@id/name" />
+        android:layout_height="wrap_content" >
 
 
-    <TextView
-        android:id="@+id/personal_description"
-        android:layout_width="145dp"
-        android:layout_height="61dp"
-        android:layout_below="@id/ID"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        android:layout_marginTop="116dp"
-        android:gravity="center"
+            <include layout="@layout/person_index_title"/>
 
-        android:text="个性签名:zzz"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@id/person"
-        app:layout_constraintTop_toBottomOf="@id/person" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <include layout="@layout/person_index_first" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <include layout="@layout/person_index_second" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
@@ -72,7 +45,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/personal_description"
         app:layout_constraintVertical_bias="1.0"
         app:menu="@menu/navigation" />
 

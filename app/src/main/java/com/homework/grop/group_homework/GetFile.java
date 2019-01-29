@@ -29,9 +29,9 @@ public class GetFile extends AppCompatActivity {
     private static final int IMAGE_MODE=1;
     private static final int VIDEO_MODE=2;
 
-    private Button mImage;
-    private Button mVidoe;
     private FloatingActionButton mPost;
+    private FloatingActionButton mImage;
+    private FloatingActionButton mVideo;
 
     public Uri mSelectedImage;
     private Uri mSelectedVideo;
@@ -41,8 +41,8 @@ public class GetFile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_getfile);
 
-        mImage=(Button)findViewById(R.id.file_image);
-        mVidoe=(Button)findViewById(R.id.file_video);
+        mImage=(FloatingActionButton) findViewById(R.id.file_image);
+        mVideo=(FloatingActionButton)findViewById(R.id.file_video);
         mPost=(FloatingActionButton) findViewById(R.id.file_post);
 
         mImage.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +51,7 @@ public class GetFile extends AppCompatActivity {
                 chooseImage();
             }
         });
-        mVidoe.setOnClickListener(new View.OnClickListener() {
+        mVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 chooseVideo();
@@ -89,18 +89,17 @@ public class GetFile extends AppCompatActivity {
 
         if(resultCode==RESULT_OK && data!=null){
             if(requestCode==IMAGE_MODE){
-                mImage.setText("ok");
                 mSelectedImage=data.getData();
+                mImage.setImageDrawable(getResources().getDrawable(R.drawable.upload));
             }
             else if(requestCode==VIDEO_MODE){
                 mSelectedVideo=data.getData();
-                mVidoe.setText("ok");
+                mVideo.setImageDrawable(getResources().getDrawable(R.drawable.upload));
             }
         }
     }
 
     private void postVideo() {
-//        take_camera_file.setText("POSTING...");
         mPost.setEnabled(false);
         RetrofitManager.get(IMiniDouyinService.HOST).create(IMiniDouyinService.class).createVideo("1120170000", "test", getMultipartFromUri("cover_image", mSelectedImage), getMultipartFromUri("video", mSelectedVideo)).enqueue(new Callback<PostVideoResponse>() {
             @Override
@@ -109,10 +108,8 @@ public class GetFile extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     toast = "Post Success!";
                     mPost.setImageDrawable(getResources().getDrawable(R.drawable.upload));
-//                    take_camera_file.setText(R.string.success_try_refresh);
                 } else {
                     toast = "Post Failure...";
-//                    take_camera_file.setText(R.string.post_it);
                 }
                 Toast.makeText(GetFile.this, toast, Toast.LENGTH_LONG).show();
                 mPost.setEnabled(true);
@@ -120,7 +117,6 @@ public class GetFile extends AppCompatActivity {
 
             @Override public void onFailure(Call<PostVideoResponse> call, Throwable t) {
                 Toast.makeText(GetFile.this, t.getMessage(), Toast.LENGTH_LONG).show();
-//                take_camera_file.setText(R.string.post_it);
                 mPost.setEnabled(true);
             }
         });

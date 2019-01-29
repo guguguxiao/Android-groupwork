@@ -28,8 +28,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailVideoActivity" />
-        <activity android:name=".ChatroomActivity" />
+        <activity android:name=".DetailVideoActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ChatroomActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".MessageActivity" />
         <activity
             android:name=".GetFile"

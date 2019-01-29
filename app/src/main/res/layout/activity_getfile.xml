@@ -1,42 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@drawable/zzz">
+    android:background="@drawable/bgd">
 
-    <Button
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/file_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="select image"
-        android:layout_toLeftOf="@id/file_post"
-        android:layout_above="@id/file_post"
-        android:layout_marginBottom="20dp"/>
+        android:layout_above="@id/up_image"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/image"/>
 
-    <Button
+    <TextView
+        android:id="@+id/up_image"
+        android:layout_width="100dp"
+        android:layout_height="20dp"
+        android:text="Select Image"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:layout_above="@id/file_video"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"/>
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/file_video"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="select video"
-        android:layout_toRightOf="@id/file_post"
-        android:layout_above="@id/file_post"
-        android:layout_marginBottom="20dp"/>
+        android:layout_centerInParent="true"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/video"/>
 
-    <!--<Button-->
-        <!--android:id="@+id/file_post"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Post it!"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginBottom="150dp" />-->
+    <TextView
+        android:id="@+id/up_video"
+        android:layout_width="100dp"
+        android:layout_height="20dp"
+        android:text="Select Video"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:layout_below="@id/file_video"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/file_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/up_video"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="150dp"
         android:src="@drawable/upload2"/>
+
+    <TextView
+        android:id="@+id/up_post"
+        android:layout_width="100dp"
+        android:layout_height="20dp"
+        android:text="Upload"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:layout_below="@id/file_post"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"/>
 
 </RelativeLayout>
